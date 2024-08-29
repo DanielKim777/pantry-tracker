@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from 'react'; // 이 부분은 useState와 useEffect를 사용해서 상태 관리나 컴포넌트 생명주기 관리 같은 로직을 사용할 준비를 하는 거야.
 // 이 훅들은 클라이언트 측에서만 동작해, 그래서 'use client'를 사용한 파일에서 잘 맞아떨어져. Home 컴포넌트가 나중에 상태 관리나 생명주기 이벤트에 반응하게 될 때 이 훅들이 필요할 수 있어.
 import { firestore } from '@/firebase'; // 아까 firebase.js를 가져오는 거야
+import { getAnalytics, isSupported } from "firebase/analytics"; // Ensure these are correctly imported
 import { Box, Typography, Modal, Stack, TextField, Button } from "@mui/material";
 import { collection, getDocs, query, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore"; // query 함수 추가
 
@@ -44,10 +45,14 @@ export default function Home() {
   useEffect(() => {
     const initializeAnalytics = async () => {
       if (typeof window !== 'undefined') { // Ensure this code only runs in the browser
-        const supported = await isSupported(); // Check if analytics is supported
-        if (supported) {
-          const analytics = getAnalytics(); // Initialize analytics
-          // You can add more analytics-related code here
+        try {
+          const supported = await isSupported(); // Check if analytics is supported
+          if (supported) {
+            const analytics = getAnalytics(app); // Initialize analytics using the Firebase app
+            // You can add more analytics-related code here
+          }
+        } catch (error) {
+          console.error('Analytics initialization failed:', error);
         }
       }
     };
