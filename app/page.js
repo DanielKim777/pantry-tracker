@@ -28,6 +28,7 @@ export default function Home() {
   const [itemName, setItemName] = useState(''); // 사용자가 추가하거나 검색하려는 아이템의 이름을 저장하는 상태야. 초기값은 빈 문자열('')로 설정되어 있어.
   const [open, setOpen] = useState(false); // 모달의 열림/닫힘 상태를 관리하는 변수와 함수 추가
 
+
   // 이 함수는 Firestore에서 inventory라는 컬렉션을 가져오기 위해 작성된 비동기 함수야.
   // 여기서 async 키워드를 사용한 것은 이 함수가 비동기적으로 동작하며, await를 사용해 비동기 작업을 기다릴 수 있다는 것을 의미해.
   const updateInventory = async () => {
@@ -41,8 +42,20 @@ export default function Home() {
   }
 
   useEffect(() => {
-    updateInventory()
-  }, [])
+    const initializeAnalytics = async () => {
+      if (typeof window !== 'undefined') { // Ensure this code only runs in the browser
+        const supported = await isSupported(); // Check if analytics is supported
+        if (supported) {
+          const analytics = getAnalytics(); // Initialize analytics
+          // You can add more analytics-related code here
+        }
+      }
+    };
+
+    initializeAnalytics(); // Call the function to initialize analytics
+
+    updateInventory(); // Fetch inventory data
+  }, []);
 
   const addItem = async (item) => {
     const docRef = doc(collection(firestore, 'inventory'), item)
