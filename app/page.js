@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'; // 이 부분은 useState와 useEff
 // 이 훅들은 클라이언트 측에서만 동작해, 그래서 'use client'를 사용한 파일에서 잘 맞아떨어져. Home 컴포넌트가 나중에 상태 관리나 생명주기 이벤트에 반응하게 될 때 이 훅들이 필요할 수 있어.
 import { firestore } from '@/firebase'; // 아까 firebase.js를 가져오는 거야
 import { getAnalytics, isSupported } from "firebase/analytics"; // Ensure these are correctly imported
+import { app } from '@/firebase'; // Ensure your Firebase app is correctly initialized
 import { Box, Typography, Modal, Stack, TextField, Button } from "@mui/material";
 import { collection, getDocs, query, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore"; // query 함수 추가
 
@@ -28,7 +29,6 @@ export default function Home() {
   const [inventory, setInventory] = useState([]); // 현재 인벤토리(목록)의 상태를 저장하는 변수야. 초기값은 빈 배열([])로 설정되어 있어.
   const [itemName, setItemName] = useState(''); // 사용자가 추가하거나 검색하려는 아이템의 이름을 저장하는 상태야. 초기값은 빈 문자열('')로 설정되어 있어.
   const [open, setOpen] = useState(false); // 모달의 열림/닫힘 상태를 관리하는 변수와 함수 추가
-
 
   // 이 함수는 Firestore에서 inventory라는 컬렉션을 가져오기 위해 작성된 비동기 함수야.
   // 여기서 async 키워드를 사용한 것은 이 함수가 비동기적으로 동작하며, await를 사용해 비동기 작업을 기다릴 수 있다는 것을 의미해.
@@ -90,11 +90,6 @@ export default function Home() {
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
-
-  // 컴포넌트가 마운트될 때 updateInventory 함수를 호출해 Firestore에서 데이터를 가져와.
-  useEffect(() => {
-    updateInventory();
-  }, []);
 
   // 데이터를 화면에 출력
   return (
@@ -179,12 +174,10 @@ export default function Home() {
               <Button variant="contained" onClick={() => removeItem(name)}>
                 -
               </Button>
-
             </Box>
           ))}
         </Stack>
       </Box>
     </Box>
   )
-
 }
